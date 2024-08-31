@@ -1,23 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useState } from 'react';
+import StartScreen from './components/StartGame';
+import InGameScreen from './components/InGame';
+import EndScreen from './components/EndGame';
+import ReviewScreen from './components/Review';
+import questionsData from './data/questions.json';
 function App() {
+  const [stage, setStage] = useState('start');
+  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState([]);
+
+  const handleStart = () => setStage('in-game');
+
+  const handleEnd = (answers) => {
+    const correctAnswers = answers.filter((answer, index) =>
+      answer === questionsData[index].answers.findIndex(a => a.correct)
+    ).length;
+    setScore(correctAnswers);
+    setAnswers(answers);
+    setStage('end');
+  };
+
+  const handleTryAgain = () => {
+    setStage('start');
+    setScore(0);
+    setAnswers([]);
+  };
+
+  const handleReview = () => setStage('review');
+
+  const handleRestart = () => setStage('start');
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {stage === 'start' && <StartScreen onStart={handleStart} />}
+      {stage === 'in-game' && <InGameScreen onEnd={handleEnd} />}
+      {stage === 'end' && <EndScreen score={score} onTryAgain={handleTryAgain} onReview={handleReview} />}
+      {stage === 'review' && <ReviewScreen answers={answers} onRestart={handleRestart} />}
     </div>
   );
 }
