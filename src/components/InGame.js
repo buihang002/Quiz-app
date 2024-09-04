@@ -16,20 +16,28 @@ const InGameScreen = ({ onEnd }) => {
   };
 
   const handleNext = () => {
-    setAnswers([...answers, selectedAnswer]);
+    setAnswers((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[currentQuestionIndex] = selectedAnswer;
+      return newAnswers;
+    });
     setSelectedAnswer(null);
     setCurrentQuestionIndex((prev) => prev + 1);
   };
 
   const handleSubmit = () => {
-    setAnswers([...answers, selectedAnswer]);
+    setAnswers((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[currentQuestionIndex] = selectedAnswer;
+      return newAnswers;
+    });
     onEnd(answers);
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
-      setSelectedAnswer(answers[currentQuestionIndex - 1]);
+      setSelectedAnswer(answers[currentQuestionIndex - 1] || null);
     }
   };
 
@@ -52,30 +60,29 @@ const InGameScreen = ({ onEnd }) => {
   }, [timeLeft]);
 
   return (
-    <div className="bg-[#A5B4FC] h-screen text-xl flex flex-col items-center pt-6 ">
+    <div className="bg-[#A5B4FC] h-screen text-xl flex flex-col items-center pt-6">
       <div className="flex justify-center w-full max-w-lg px-4 mt-6 space-x-4 pb-10">
         <button
-          className=" rounded-lg shadow-lg hover:shadow-2xl  font-bold py-2.5 px-10 rounded bg-gray-600 text-white font-bold py-2 px-6 rounded bg-[#e5e7eb] text-gray-300"
+          className="rounded-lg shadow-lg hover:shadow-2xl font-bold py-2.5 px-10 bg-gray-600 text-white disabled:bg-[#e5e7eb]"
           onClick={handlePrevious}
           disabled={currentQuestionIndex === 0}
         >
           Previous
         </button>
-        {isLastQuestion ? (
+        <button
+          className="text-black hover:text-white rounded-lg shadow-lg hover:shadow-2xl font-bold py-2.5 px-10 bg-[#9ff9ba] hover:bg-[#6ED5B7] text-white font-bold py-2 px-6 rounded disabled:bg-gray-400"
+          onClick={handleNext}
+          disabled={selectedAnswer === null || isLastQuestion}
+        >
+          Next
+        </button>
+        {isLastQuestion && (
           <button
-            className="bg-yellow-500 text-white font-bold py-2 px-6 rounded disabled:bg-gray-400"
+            className=" bg-[#F59E0B] hover:bg-yellow-500 text-white shadow-lg hover:shadow-2xl font-bold py-2 px-6 rounded disabled:bg-gray-400"
             onClick={handleSubmit}
             disabled={selectedAnswer === null}
           >
             Submit
-          </button>
-        ) : (
-          <button
-            className="text-black hover:text-white rounded-lg shadow-lg hover:shadow-2xl font-bold py-2.5 px-10 bg-[#9ff9ba] hover:bg-[#6ED5B7] text-white font-bold py-2 px-6 rounded disabled:bg-gray-400"
-            onClick={handleNext}
-            disabled={selectedAnswer === null}
-          >
-            Next
           </button>
         )}
       </div>
@@ -91,7 +98,7 @@ const InGameScreen = ({ onEnd }) => {
               {formatTime(timeLeft)}
             </div>
           </div>
-          <div className="text-center pt-24 pb-16 p-2 ">
+          <div className="text-center pt-24 pb-16 p-2">
             <p className="text-blue-700 text-lg">
               Question{" "}
               <span className="font-bold">{currentQuestionIndex + 1}</span>/
@@ -102,16 +109,16 @@ const InGameScreen = ({ onEnd }) => {
             </h2>
           </div>
         </div>
-        <div className="pl-6 pr-6  ">
-          <div className="flex flex-col gap-4 mt-6 content-center  ">
+        <div className="pl-6 pr-6">
+          <div className="flex flex-col gap-4 mt-6 content-center">
             {currentQuestion.answers.map((answer, index) => (
               <button
                 key={index}
                 className={`p-4 border rounded-lg shadow-lg ${
                   selectedAnswer === index
                     ? "bg-indigo-800 text-white"
-                    : "bg-white text-gray-800"
-                } hover:bg-[#312E81] hover:text-white transition`}
+                    : "bg-white text-gray-800 hover:bg-indigo-800 hover:text-white transition"
+                }`}
                 onClick={() => handleAnswerClick(index)}
               >
                 {answer.answer_content}
